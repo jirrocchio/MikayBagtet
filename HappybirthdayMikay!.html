@@ -1,0 +1,721 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Happy Birthday, Michaela — A Magical Surprise</title>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <meta name="description" content="A blue, magical birthday upgrade of the original gift — sparkles, particles, surprises, and an animated birthday greeting.">
+
+  <style>
+    :root{
+      --bg-start: #e9f6ff;
+      --bg-end: #f3fbff;
+      --deep-blue: #064b9a;
+      --accent: #2aa0ff;
+      --gold: #f6c85f;
+      --card: #ffffff;
+      --muted: #6b7280;
+      --glass: rgba(255,255,255,0.65);
+      --max-width: 1100px;
+      --ui-radius: 14px;
+      --control-padding: 10px 14px;
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html,body { height:100%; margin:0; font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; background: linear-gradient(135deg,var(--bg-start),var(--bg-end)); color:var(--deep-blue); -webkit-font-smoothing:antialiased; }
+    img { display:block; max-width:100%; height:auto; }
+
+    /* Page container */
+    .container { max-width:var(--max-width); margin:0 auto; padding:12px; }
+
+    /* Header */
+    header { display:flex; align-items:center; justify-content:space-between; padding:14px 18px; gap:12px; }
+    .logo { font-family:'Great Vibes', cursive; font-size:clamp(20px, 3.2vw, 28px); color:var(--accent); }
+    nav { display:flex; gap:8px; align-items:center; }
+    nav a { padding:8px 12px; border-radius:10px; text-decoration:none; color:var(--deep-blue); font-weight:600; opacity:0.95; font-size:clamp(13px,1.6vw,15px); }
+    nav a.active { background:linear-gradient(90deg,var(--accent),#4bb7ff); color:white; box-shadow:0 8px 28px rgba(10,90,200,0.12); }
+
+    /* Controls */
+    .controls { display:flex; gap:10px; align-items:center; }
+    .control-btn { background:var(--glass); border:1px solid rgba(11,108,255,0.08); padding:var(--control-padding); border-radius:999px; cursor:pointer; font-weight:700; backdrop-filter: blur(6px); display:inline-flex; gap:8px; align-items:center; font-size:clamp(14px,1.8vw,16px); }
+    .control-btn:active { transform:translateY(1px); }
+    .control-btn.big { padding:12px 18px; font-size:18px; }
+
+    main { padding: 0 18px 48px; }
+
+    /* Banner */
+    .banner { margin:16px auto 18px; width:100%; position:relative; border-radius:18px; padding:18px; background:linear-gradient(180deg, rgba(10,110,255,0.06), rgba(10,160,255,0.02)); box-shadow:0 10px 30px rgba(10,80,150,0.06); display:flex; gap:16px; align-items:center; justify-content:space-between; }
+    .banner-left { display:flex; gap:16px; align-items:center; min-width:0; }
+    .crown { font-size:clamp(28px,4vw,40px); transform:translateY(-2px); }
+    .heading { font-family:'Great Vibes', cursive; font-size:clamp(28px,6vw,44px); color:var(--deep-blue); margin:0; line-height:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .sub { color:var(--muted); margin:4px 0 0; font-weight:500; font-size:clamp(12px,1.6vw,15px); }
+    .ribbon { position:absolute; left:14px; top:-14px; background:linear-gradient(90deg,#2aa0ff,#4bb7ff); padding:8px 12px; border-radius:12px; color:white; font-weight:700; box-shadow:0 8px 20px rgba(43,137,255,0.18); transform:rotate(-4deg); font-size:14px; }
+
+    /* Slideshow container */
+    .slideshow-container { margin-top:12px; display:flex; flex-direction:column; align-items:center; gap:14px; }
+    .slide-card { width:100%; max-width:520px; border-radius:calc(var(--ui-radius) + 4px); overflow:hidden; background:linear-gradient(180deg, rgba(255,255,255,0.95), rgba(250,255,255,0.9)); box-shadow:0 18px 40px rgba(10,60,120,0.06); position:relative; padding:16px; }
+    .slides { position:relative; display:flex; align-items:center; justify-content:center; overflow:visible; width:100%; }
+
+    /* Use aspect-ratio to keep square frame; fallback handled by height */
+    .image-frame { width:88%; max-width:420px; aspect-ratio: 1 / 1; height:auto; border-radius:16px; overflow:hidden; box-shadow: 0 18px 40px rgba(11,108,255,0.12); transform-origin:center; transition:transform .35s, box-shadow .35s; border:6px solid rgba(255,255,255,0.15); background:linear-gradient(180deg, rgba(10,120,255,0.04), rgba(10,160,255,0.02)); display:flex; align-items:center; justify-content:center; }
+    .slide { display:none; flex-direction:column; align-items:center; gap:12px; width:100%; border-radius:12px; background:transparent; transition:opacity .6s, transform .6s; will-change: transform, opacity; }
+    .slide.active { display:flex; opacity:1; transform:translateY(0); }
+
+    .caption { font-size:clamp(14px,2vw,18px); color:var(--deep-blue); padding:0 12px; text-align:center; font-weight:600; }
+
+    /* Thumbnails: scrollable on small screens */
+    .thumbs { display:flex; gap:8px; justify-content:center; margin-top:10px; flex-wrap:nowrap; overflow-x:auto; padding:6px; -webkit-overflow-scrolling:touch; }
+    .thumb { flex:0 0 auto; width:62px; height:62px; border-radius:10px; overflow:hidden; border:2px solid transparent; cursor:pointer; transition:transform .18s, border-color .18s; background:white; padding:0; }
+    .thumb img { width:100%; height:100%; object-fit:cover; display:block; }
+    .thumb.active { transform:scale(1.06); border-color:rgba(42,160,255,0.9); box-shadow:0 8px 18px rgba(42,160,255,0.12); }
+
+    /* Controls area */
+    .controls-row { display:flex; justify-content:center; gap:10px; margin-top:12px; flex-wrap:wrap; }
+
+    /* Surprise modal */
+    .modal-backdrop { position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:150; padding:20px; }
+    .modal-backdrop.show { display:flex; }
+    .modal { width:100%; max-width:720px; border-radius:16px; padding:22px; background:linear-gradient(180deg,#ffffff,#f8fdff); box-shadow:0 30px 80px rgba(8,40,80,0.25); text-align:center; position:relative; }
+    .modal h2 { margin:6px 0 6px; font-family:'Great Vibes', cursive; font-size:clamp(28px,4.6vw,44px); color:var(--deep-blue); }
+    .modal p { color:var(--muted); margin:8px 0 14px; font-weight:600; }
+
+    .gift { margin-top:8px; font-weight:800; color:var(--accent); font-size:clamp(14px,2vw,18px); }
+
+    /* final greeting area */
+    .final-greeting { margin-top:14px; padding:12px; border-radius:12px; background:linear-gradient(90deg, rgba(42,160,255,0.06), rgba(11,108,255,0.03)); box-shadow:0 10px 28px rgba(11,108,255,0.06); display:flex; flex-direction:column; gap:8px; align-items:center; }
+    .final-greeting h3 { font-family:'Great Vibes', cursive; color:var(--deep-blue); font-size:clamp(20px,4.2vw,32px); margin:0; }
+    .final-greeting p { color:var(--muted); margin:0; font-weight:600; }
+
+    /* canvas overlays */
+    #sparkles, #confetti { position:fixed; left:0; top:0; width:100%; height:100%; pointer-events:none; z-index:120; }
+
+    /* Responsive breakpoints */
+    @media (max-width:920px){
+      .banner { padding:14px; gap:12px; }
+      .heading { font-size: clamp(22px,6vw,36px); white-space:normal; }
+      .slide-card { padding:14px; }
+      .image-frame { width:92%; max-width:360px; }
+    }
+
+    @media (max-width:520px){
+      header { padding:10px 12px; }
+      .banner { flex-direction:column; align-items:center; text-align:center; padding:12px; gap:8px; }
+      .banner-left { justify-content:center; }
+      .ribbon { left:10px; top:-12px; font-size:13px; }
+      .controls { gap:8px; }
+      .control-btn { padding:10px 12px; font-size:15px; }
+      .control-btn.big { padding:12px 16px; font-size:16px; }
+      .thumb { width:52px; height:52px; }
+      .image-frame { width:92%; max-width:320px; aspect-ratio: 1 / 1; }
+      .slides { height:auto; }
+      .caption { font-size:15px; }
+      .controls-row { gap:8px; }
+    }
+
+    /* very small screens */
+    @media (max-width:380px){
+      .logo { font-size:20px; }
+      .ribbon { display:none; }
+      .heading { font-size:26px; }
+      .thumb { width:48px; height:48px; }
+      .control-btn { font-size:14px; padding:9px 10px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Sparkle & Confetti canvases -->
+    <canvas id="sparkles" aria-hidden="true"></canvas>
+    <canvas id="confetti" aria-hidden="true"></canvas>
+
+    <!-- Background audio (optional; toggled by Play button) -->
+    <audio id="bgMusic" loop preload="auto">
+      <source src="mikaybday.mp3" type="audio/mpeg">
+      <source src="mikaybday.mp3" type="audio/mpeg">
+      <!-- fallback: if files are missing, nothing will play -->
+    </audio>
+
+    <!-- Gift-specific audio: will play once when she opens the gift
+         Using uploaded local path per session: -->
+    <audio id="giftMusic" preload="auto">
+      <source src="bdayMikay.mp3" type="audio/mpeg">
+      <source src="michabday_open.mp3" type="audio/mpeg">
+      Your browser does not support the audio element.
+    </audio>
+
+    <header>
+      <div class="logo" aria-label="A Gift for Michaela">A Gift for you my love😚</div>
+      <nav aria-label="Primary navigation">
+        <a href="#" class="active" onclick="return false" aria-current="page">Home</a>
+        <a href="#" onclick="document.getElementById('surpriseBtn').focus(); return false">Surprise</a>
+      </nav>
+
+      <div class="controls" role="toolbar" aria-label="Controls">
+        <button id="musicToggle" class="control-btn" aria-pressed="false" title="Play / Pause music">🔈 Play</button>
+        <button id="surpriseBtn" class="control-btn" title="Open surprise">🎁 Surprise</button>
+      </div>
+    </header>
+
+    <main>
+      <div class="banner" role="banner" aria-labelledby="banner-heading">
+        <div class="ribbon" aria-hidden="true">Birthday na ni Kaelabagtet!</div>
+        <div class="banner-left">
+          <div class="crown" aria-hidden="true">👑</div>
+          <div style="min-width:0;">
+            <h1 id="banner-heading" class="heading">Happy Birthday, Mikay!</h1>
+            <div class="sub">A small surprise made with love — just for you.</div>
+          </div>
+        </div>
+
+        <div style="text-align:right;">
+          <div style="font-weight:800;color:var(--deep-blue)">From: Your King</div>
+          <div style="color:var(--muted);margin-top:6px">Today is November 22 • It's your birthday!😚🎂</div>
+        </div>
+      </div>
+
+      <section class="slideshow-container" aria-live="polite">
+        <div class="slide-card card" role="region" aria-label="Photo slideshow">
+          <div class="slides" id="slides">
+            <!-- Slides (images references unchanged) -->
+            <div class="slide active" data-index="0" aria-hidden="false">
+              <div class="image-frame" data-tilt>
+                <img src="micha1.jpg" alt="Michaela smiling 1">
+              </div>
+              <div class="caption">Hi Love — this photo of you is my favorite. ✨</div>
+            </div>
+
+            <div class="slide" data-index="1" aria-hidden="true">
+              <div class="image-frame" data-tilt>
+                <img src="micha2.jpg" alt="Michaela smiling 2">
+              </div>
+              <div class="caption">Across the miles, you're my brightest star.</div>
+            </div>
+
+            <div class="slide" data-index="2" aria-hidden="true">
+              <div class="image-frame" data-tilt>
+                <img src="micha3.jpg" alt="Michaela smiling 3">
+              </div>
+              <div class="caption">You make every day worth waking up for.</div>
+            </div>
+
+            <div class="slide" data-index="3" aria-hidden="true">
+              <div class="image-frame" data-tilt>
+                <img src="micha4.jpg" alt="Michaela smiling 4">
+              </div>
+              <div class="caption">On your day, I hope every wish finds you.</div>
+            </div>
+
+            <div class="slide" data-index="4" aria-hidden="true">
+              <div class="image-frame" data-tilt>
+                <img src="micha5.jpg" alt="Michaela smiling 5">
+              </div>
+              <div class="caption">Your smile is my favorite view.</div>
+            </div>
+
+            <div class="slide" data-index="5" aria-hidden="true">
+              <div class="image-frame" data-tilt>
+                <img src="micha6.jpg" alt="Michaela smiling 6">
+              </div>
+              <div class="caption">For your birthday: all my love, multiplied Iloveyouuu always!💖.</div>
+            </div>
+
+            <div class="slide" data-index="6" aria-hidden="true">
+              <div class="image-frame" data-tilt>
+                <img src="micha7.jpg" alt="Michaela smiling 7">
+              </div>
+              <div class="caption">Thank you for being my heart's home.</div>
+            </div>
+
+            <div class="slide" data-index="7" aria-hidden="true">
+              <div class="image-frame" data-tilt>
+                <img src="micha8.jpg" alt="Michaela smiling 8">
+              </div>
+              <div class="caption">You are my peace, my joy, my forever.</div>
+            </div>
+
+            <div class="slide" data-index="8" aria-hidden="true">
+              <div class="image-frame" data-tilt>
+                <img src="micha9.jpg" alt="Michaela smiling 9">
+              </div>
+              <div class="caption">Counting down to when I can hold you for the first time💖</div>
+            </div>
+
+            <div class="slide" data-index="9" aria-hidden="true">
+              <div class="image-frame" data-tilt>
+                <img src="micha10.jpg" alt="Michaela smiling 10">
+              </div>
+              <div class="caption">Even though lately puro lungkot ang natatanggap mo I always want to see you smile, kahit anong mangyari andito ako palagi para makinig sayo sa mga problema mo mahal ko — you're always in my heart. ❤️</div>
+            </div>
+
+            <div class="slide" data-index="10" aria-hidden="true">
+              <div class="image-frame" data-tilt>
+                <img src="micha11.jpg" alt="Michaela smiling 11">
+              </div>
+              <div class="caption">Okay lang umiyak palagi pero wag na wag kang susuko, susuportahan kita palagi and I will always be your number 1 supporter Iloveyouuu!, Kalay! Forever yours — Your King 👑</div>
+            </div>
+          </div>
+
+          <!-- thumbnail row -->
+          <div class="thumbs" id="thumbs" aria-hidden="false">
+            <!-- thumbnails generated by script -->
+          </div>
+
+          <!-- controls -->
+          <div class="controls-row" role="group" aria-label="Slideshow controls">
+            <button id="prev" class="control-btn big" aria-label="Previous photo">◀ Prev</button>
+            <button id="next" class="control-btn big" aria-label="Next photo">Next ▶</button>
+          </div>
+        </div>
+
+        <!-- Final greeting / CTA -->
+        <div class="final-greeting" id="finalGreeting" aria-live="polite" style="display:none">
+          <h3>Happy Birthday, love! 🎉</h3>
+          <p>Tap "🎁 Surprise" to reveal your special message.</p>
+        </div>
+      </section>
+    </main>
+
+    <!-- Surprise modal -->
+    <div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true" aria-hidden="true">
+      <div class="modal" role="document">
+        <h2>For Michaela — With All My Heart</h2>
+        <p>Close your eyes and make a wish. When you open it, a little surprise awaits.</p>
+        <div style="display:flex;gap:10px;justify-content:center;margin-top:12px">
+          <button id="openGift" class="control-btn big">🎁 Open Gift</button>
+          <button id="closeModal" class="control-btn big">Close</button>
+        </div>
+        <div class="gift" id="giftText" style="display:none;margin-top:14px"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ===========================
+       Utility: resize canvases
+       =========================== */
+    (function(){
+      const canvases = [document.getElementById('sparkles'), document.getElementById('confetti')];
+      function resizeAll() {
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        canvases.forEach(c => {
+          c.width = w * devicePixelRatio;
+          c.height = h * devicePixelRatio;
+          c.style.width = w + 'px';
+          c.style.height = h + 'px';
+          const ctx = c.getContext('2d');
+          if(ctx) ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+        });
+      }
+      window.addEventListener('resize', resizeAll);
+      window.addEventListener('orientationchange', () => setTimeout(resizeAll, 300));
+      // initial
+      resizeAll();
+    })();
+
+    /* -------------------------
+       Slideshow + Thumbnails + touch swipe
+       ------------------------- */
+    (function(){
+      const slides = Array.from(document.querySelectorAll('.slide'));
+      const thumbsContainer = document.getElementById('thumbs');
+      const prevBtn = document.getElementById('prev');
+      const nextBtn = document.getElementById('next');
+      const finalGreeting = document.getElementById('finalGreeting');
+      let index = 0;
+      let autoplay = true;
+      let intervalHandle = null;
+      const AUTOPLAY_INTERVAL = 4500;
+
+      // create thumbnails dynamically
+      function createThumbs(){
+        thumbsContainer.innerHTML = '';
+        slides.forEach((s, i) => {
+          const src = s.querySelector('img').getAttribute('src');
+          const btn = document.createElement('button');
+          btn.className = 'thumb';
+          btn.setAttribute('aria-label', 'Thumbnail ' + (i+1));
+          btn.innerHTML = '<img src="' + src + '" alt="Thumbnail ' + (i+1) + '">';
+          btn.addEventListener('click', () => { goTo(i); resetAutoplay(); });
+          thumbsContainer.appendChild(btn);
+        });
+        updateThumbs();
+      }
+
+      function updateThumbs(){
+        Array.from(thumbsContainer.children).forEach((t, i) => {
+          t.classList.toggle('active', i === index);
+        });
+      }
+
+      function setSlideActive(i){
+        slides.forEach((s, idx) => {
+          s.classList.toggle('active', idx === i);
+          s.setAttribute('aria-hidden', idx === i ? 'false' : 'true');
+        });
+      }
+
+      function show(i){
+        index = (i + slides.length) % slides.length;
+        setSlideActive(index);
+        updateThumbs();
+        // reveal final greeting if last slide
+        if(index === slides.length - 1){
+          finalGreeting.style.display = 'flex';
+          triggerSparkleBurst(); // small celebration
+        } else {
+          finalGreeting.style.display = 'none';
+        }
+      }
+
+      function goTo(i){
+        show(i);
+      }
+
+      prevBtn.addEventListener('click', () => { goTo(index - 1); resetAutoplay(); });
+      nextBtn.addEventListener('click', () => { goTo(index + 1); resetAutoplay(); });
+
+      function startAutoplay(){
+        if(intervalHandle) clearInterval(intervalHandle);
+        intervalHandle = setInterval(() => { goTo(index + 1); }, AUTOPLAY_INTERVAL);
+      }
+      function resetAutoplay(){
+        if(!autoplay) return;
+        startAutoplay();
+      }
+
+      // keyboard focus pause support for accessibility
+      [prevBtn, nextBtn].forEach(el => {
+        el.addEventListener('focus', () => { autoplay = false; clearInterval(intervalHandle); });
+        el.addEventListener('blur', () => { autoplay = true; startAutoplay(); });
+      });
+
+      // touch swipe (simple)
+      (function addSwipe(){
+        const slidesEl = document.getElementById('slides');
+        let startX = 0, startY = 0, dx = 0, dy = 0, touching = false;
+        slidesEl.addEventListener('touchstart', (e) => {
+          if(e.touches.length > 1) return;
+          touching = true;
+          startX = e.touches[0].clientX;
+          startY = e.touches[0].clientY;
+        }, {passive:true});
+        slidesEl.addEventListener('touchmove', (e) => {
+          if(!touching || e.touches.length > 1) return;
+          dx = e.touches[0].clientX - startX;
+          dy = e.touches[0].clientY - startY;
+        }, {passive:true});
+        slidesEl.addEventListener('touchend', () => {
+          touching = false;
+          if(Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+            if(dx < 0) { goTo(index + 1); } else { goTo(index - 1); }
+            resetAutoplay();
+          }
+          dx = 0; dy = 0;
+        });
+      })();
+
+      // init
+      createThumbs();
+      show(0);
+      startAutoplay();
+
+      // ensure thumbnails remain accessible (recreate on window resize if necessary)
+      window.addEventListener('resize', () => { /* thumbs layout handled by CSS; keep dynamic if future changes */ });
+    })();
+
+    /* -------------------------
+       Music Toggle (no autoplay forced)
+       ------------------------- */
+    (function(){
+      const musicToggle = document.getElementById('musicToggle');
+      const bg = document.getElementById('bgMusic');
+
+      musicToggle.addEventListener('click', () => {
+        if(!bg || !bg.src || bg.src.trim() === '') {
+          musicToggle.textContent = '🔈 No music';
+          musicToggle.setAttribute('aria-pressed', 'false');
+          return;
+        }
+        if(bg.paused){
+          bg.play().catch(() => { /* browsers sometimes block autoplay — silence fail */ });
+          musicToggle.textContent = '🔊 Pause';
+          musicToggle.setAttribute('aria-pressed', 'true');
+        } else {
+          bg.pause();
+          musicToggle.textContent = '🔈 Play';
+          musicToggle.setAttribute('aria-pressed', 'false');
+        }
+      });
+
+      // Attempt to start music after a user gesture (some browsers block autoplay)
+      function userGesturePlay(){
+        try { bg.play(); musicToggle.textContent = '🔊 Pause'; musicToggle.setAttribute('aria-pressed', 'true'); } catch(e){}
+        document.removeEventListener('click', userGesturePlay);
+      }
+      document.addEventListener('click', userGesturePlay, { once: true });
+    })();
+
+    /* -------------------------
+       Surprise Modal & Gift Logic (plays gift music automatically)
+       ------------------------- */
+    (function(){
+      const surpriseBtn = document.getElementById('surpriseBtn');
+      const modalBackdrop = document.getElementById('modalBackdrop');
+      const closeModal = document.getElementById('closeModal');
+      const openGift = document.getElementById('openGift');
+      const giftText = document.getElementById('giftText');
+
+      const bgMusic = document.getElementById('bgMusic');     // background track (if used)
+      const giftMusic = document.getElementById('giftMusic'); // gift-specific track
+
+      function openModal(){
+        modalBackdrop.classList.add('show');
+        modalBackdrop.setAttribute('aria-hidden', 'false');
+        openGift.focus();
+      }
+      function hideModal(){
+        modalBackdrop.classList.remove('show');
+        modalBackdrop.setAttribute('aria-hidden', 'true');
+        giftText.style.display = 'none';
+        giftText.textContent = '';
+        // stop gift music when modal closed
+        if(giftMusic && !giftMusic.paused){
+          try { giftMusic.pause(); giftMusic.currentTime = 0; } catch(e){}
+        }
+      }
+
+      surpriseBtn.addEventListener('click', openModal);
+      closeModal.addEventListener('click', hideModal);
+      modalBackdrop.addEventListener('click', (e) => { if(e.target === modalBackdrop) hideModal(); });
+
+      openGift.addEventListener('click', () => {
+        // Show heartfelt message
+        giftText.style.display = 'block';
+        giftText.textContent = "Happy Birthday, Mikay — my love, my bagtet! May your day be as bright as your smile. Be happy always mahal ko ayan ang lagi kong pinapa-alala sayo, kase gusto ko palaging masaya ka and alam ko namang hindi palagi ayos ang araw mo there'll be unexpected days na hindi okay, pero kahit anong mangyari gusto ko maging masaya ka kase ika'y strong independent woman habang wala pa ako dyan sa piling mo and proud ako sayo palagi lagi mong tatandaan😚 enjoy mo lang ang araw mo ngayon and be safe, I always wish all the best for you Iloveyouuu, always mahal ko😚. — Your King 👑";
+
+        // Pause any background music (if playing)
+        if(bgMusic && !bgMusic.paused){
+          try { bgMusic.pause(); } catch(e){}
+        }
+
+        // Play the gift music (this is called in response to a user click -> allowed by browsers)
+        if(giftMusic){
+          try {
+            giftMusic.currentTime = 0;
+            giftMusic.volume = 0.95;
+            const playPromise = giftMusic.play();
+            if(playPromise && typeof playPromise.then === 'function'){
+              playPromise.catch(() => {
+                // if play was blocked, optionally notify or silently ignore
+              });
+            }
+            // Optionally when giftMusic ends, you can resume bgMusic (not requested, so left unchanged)
+          } catch(e){
+            // ignore play errors
+          }
+        } else {
+          // fallback: if no giftMusic element, try creating a one-off Audio object
+          try {
+            const a = new Audio('/mnt/data/michabday_open.mp3');
+            a.volume = 0.95;
+            a.play().catch(()=>{});
+          } catch(e){}
+        }
+
+        // trigger visuals
+        launchConfetti();
+        triggerSparkleBurst(120);
+      });
+
+      // close with escape
+      document.addEventListener('keydown', (e) => {
+        if(e.key === 'Escape' && modalBackdrop.classList.contains('show')) hideModal();
+      });
+    })();
+
+    /* -------------------------
+       Tilt effect (mouse) - keep lightweight for mobile (no tilt)
+       ------------------------- */
+    (function(){
+      const frames = document.querySelectorAll('[data-tilt]');
+      frames.forEach(frame => {
+        let bound = null;
+        function onMove(e){
+          const rect = frame.getBoundingClientRect();
+          const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+          const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+          const x = (clientX - rect.left) / rect.width;
+          const y = (clientY - rect.top) / rect.height;
+          const rotateY = (x - 0.5) * 8;
+          const rotateX = (0.5 - y) * 8;
+          frame.style.transform = `perspective(700px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
+        }
+        function clear(){
+          frame.style.transform = 'perspective(700px) rotateX(0deg) rotateY(0deg) scale(1)';
+        }
+        // only enable mousemove on pointerfine devices (desktop)
+        if(window.matchMedia && window.matchMedia('(pointer: fine)').matches){
+          frame.addEventListener('mousemove', onMove);
+          frame.addEventListener('mouseleave', clear);
+        } else {
+          // on touch devices, use subtle scale on touch
+          frame.addEventListener('touchstart', (e) => { frame.style.transform = 'scale(1.01)'; }, {passive:true});
+          frame.addEventListener('touchend', () => { frame.style.transform = 'scale(1)'; }, {passive:true});
+        }
+      });
+    })();
+
+    /* ===========================
+       Sparkles & Confetti (updated canvas scaling)
+       =========================== */
+    (function(){
+      // Sparkles
+      const canvas = document.getElementById('sparkles');
+      const ctx = canvas.getContext('2d');
+      let particles = [];
+      let W = canvas.width = innerWidth * devicePixelRatio;
+      let H = canvas.height = innerHeight * devicePixelRatio;
+      canvas.style.width = innerWidth + 'px';
+      canvas.style.height = innerHeight + 'px';
+      ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+
+      function rand(min,max){ return Math.random()*(max-min)+min; }
+
+      function makeParticle(x,y,spread=200){
+        return {
+          x: x + rand(-spread, spread),
+          y: y + rand(-spread, spread),
+          vx: rand(-0.7, 0.7),
+          vy: rand(-1.2, -0.2),
+          life: rand(70, 160),
+          size: rand(1,3),
+          hue: rand(190, 220),
+          alpha: 1
+        };
+      }
+
+      function triggerSparkleBurst(count=36){
+        const centerX = innerWidth * 0.5;
+        const centerY = innerHeight * 0.35;
+        for(let i=0;i<count;i++){ particles.push(makeParticle(centerX, centerY, innerWidth*0.35)); }
+      }
+      window.triggerSparkleBurst = triggerSparkleBurst;
+
+      function update(){
+        ctx.clearRect(0,0,innerWidth,innerHeight);
+        for(let i = particles.length-1; i >= 0; i--){
+          const p = particles[i];
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += 0.02;
+          p.life--;
+          p.alpha = p.life/160;
+          if(p.life <= 0) particles.splice(i,1);
+          else {
+            ctx.beginPath();
+            ctx.fillStyle = `hsla(${p.hue},85%,60%,${Math.max(0,p.alpha)})`;
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.fillStyle = `hsla(${p.hue},85%,60%,${Math.max(0,p.alpha*0.22)})`;
+            ctx.arc(p.x, p.y, p.size*4, 0, Math.PI*2);
+            ctx.fill();
+          }
+        }
+        requestAnimationFrame(update);
+      }
+      update();
+
+      // gentle continuous micro-sparkles across the top
+      setInterval(() => {
+        const count = Math.floor(Math.random()*3);
+        for(let i=0;i<count;i++){ particles.push(makeParticle(rand(0,innerWidth), rand(0,innerHeight*0.12), 60)); }
+      }, 600);
+
+      // Confetti
+      const confetti = document.getElementById('confetti');
+      const cctx = confetti.getContext('2d');
+      let confettiPieces = [];
+
+      function ConfettiPiece(x,y,angle,spread,colour){
+        this.x = x;
+        this.y = y;
+        this.vx = Math.cos(angle) * spread * (Math.random()*0.6 + 0.7);
+        this.vy = Math.sin(angle) * spread * (Math.random()*0.6 + 0.7);
+        this.size = Math.random() * 6 + 6;
+        this.rotation = Math.random() * 360;
+        this.rotationSpeed = (Math.random() - 0.5) * 8;
+        this.colour = colour;
+        this.life = 120 + Math.random()*40;
+      }
+
+      function launchConfetti(amount=80){
+        const cx = innerWidth * 0.5;
+        const cy = innerHeight * 0.35;
+        const colors = ['#ffd700','#fff3b0','#4dd0ff','#2aa0ff','#ff7ab6','#a8ffef'];
+        for(let i=0;i<amount;i++){
+          const angle = Math.PI * (Math.random()*1 - 0.5);
+          const spread = 6 + Math.random()*6;
+          confettiPieces.push(new ConfettiPiece(cx, cy, angle, spread, colors[Math.floor(Math.random()*colors.length)]));
+        }
+      }
+      window.launchConfetti = launchConfetti;
+
+      function step(){
+        cctx.clearRect(0,0,innerWidth,innerHeight);
+        for(let i = confettiPieces.length-1; i>=0; i--){
+          const p = confettiPieces[i];
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += 0.18;
+          p.vx *= 0.995;
+          p.rotation += p.rotationSpeed;
+          p.life--;
+          if(p.life <= 0 || p.y > innerHeight + 50) confettiPieces.splice(i,1);
+          else {
+            cctx.save();
+            cctx.translate(p.x, p.y);
+            cctx.rotate(p.rotation * Math.PI/180);
+            cctx.fillStyle = p.colour;
+            cctx.fillRect(-p.size/2, -p.size/2, p.size, p.size*0.6);
+            cctx.restore();
+          }
+        }
+        requestAnimationFrame(step);
+      }
+      step();
+
+      // Keep canvas dimensions up to date for high-DPI devices
+      function adjustCanvasSizes(){
+        const dpr = devicePixelRatio || 1;
+        [canvas, confetti].forEach(c => {
+          c.width = innerWidth * dpr;
+          c.height = innerHeight * dpr;
+          c.style.width = innerWidth + 'px';
+          c.style.height = innerHeight + 'px';
+          const ctx2 = c.getContext('2d');
+          if(ctx2) ctx2.setTransform(dpr,0,0,dpr,0,0);
+        });
+      }
+      window.addEventListener('resize', () => setTimeout(adjustCanvasSizes, 60));
+      window.addEventListener('orientationchange', () => setTimeout(adjustCanvasSizes, 300));
+      adjustCanvasSizes();
+    })();
+
+    /* -------------------------
+       Small accessibility keyboard hooks
+       ------------------------- */
+    (function(){
+      document.addEventListener('keydown', (e) => {
+        if(e.key === 'ArrowRight') document.getElementById('next').click();
+        if(e.key === 'ArrowLeft') document.getElementById('prev').click();
+      });
+    })();
+  </script>
+</body>
+</html>
