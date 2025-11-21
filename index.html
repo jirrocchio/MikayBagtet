@@ -32,15 +32,15 @@
     /* Page container */
     .container { max-width:var(--max-width); margin:0 auto; padding:12px; }
 
-    /* Header */
-    header { display:flex; align-items:center; justify-content:space-between; padding:14px 18px; gap:12px; }
+    /* Header - made flexible for mobile */
+    header { display:flex; align-items:center; justify-content:space-between; padding:14px 18px; gap:12px; flex-wrap:wrap; }
     .logo { font-family:'Great Vibes', cursive; font-size:clamp(20px, 3.2vw, 28px); color:var(--accent); }
-    nav { display:flex; gap:8px; align-items:center; }
-    nav a { padding:8px 12px; border-radius:10px; text-decoration:none; color:var(--deep-blue); font-weight:600; opacity:0.95; font-size:clamp(13px,1.6vw,15px); }
+    nav { display:flex; gap:8px; align-items:center; flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch; padding-bottom:6px; }
+    nav a { padding:8px 12px; border-radius:10px; text-decoration:none; color:var(--deep-blue); font-weight:600; opacity:0.95; font-size:clamp(13px,1.6vw,15px); white-space:nowrap; }
     nav a.active { background:linear-gradient(90deg,var(--accent),#4bb7ff); color:white; box-shadow:0 8px 28px rgba(10,90,200,0.12); }
 
     /* Controls */
-    .controls { display:flex; gap:10px; align-items:center; }
+    .controls { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
     .control-btn { background:var(--glass); border:1px solid rgba(11,108,255,0.08); padding:var(--control-padding); border-radius:999px; cursor:pointer; font-weight:700; backdrop-filter: blur(6px); display:inline-flex; gap:8px; align-items:center; font-size:clamp(14px,1.8vw,16px); }
     .control-btn:active { transform:translateY(1px); }
     .control-btn.big { padding:12px 18px; font-size:18px; }
@@ -79,8 +79,8 @@
     /* Surprise modal */
     .modal-backdrop { position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:150; padding:20px; }
     .modal-backdrop.show { display:flex; }
-    .modal { width:100%; max-width:720px; border-radius:16px; padding:22px; background:linear-gradient(180deg,#ffffff,#f8fdff); box-shadow:0 30px 80px rgba(8,40,80,0.25); text-align:center; position:relative; }
-    .modal h2 { margin:6px 0 6px; font-family:'Great Vibes', cursive; font-size:clamp(28px,4.6vw,44px); color:var(--deep-blue); }
+    .modal { width:100%; max-width:720px; border-radius:16px; padding:22px; background:linear-gradient(180deg,#ffffff,#f8fdff); box-shadow:0 30px 80px rgba(8,40,80,0.25); text-align:center; position:relative; max-height: calc(100vh - 48px); overflow:auto; }
+    .modal h2 { margin:6px 0 6px 0; font-family:'Great Vibes', cursive; font-size:clamp(28px,4.6vw,44px); color:var(--deep-blue); }
     .modal p { color:var(--muted); margin:8px 0 14px; font-weight:600; }
 
     .gift { margin-top:8px; font-weight:800; color:var(--accent); font-size:clamp(14px,2vw,18px); }
@@ -114,6 +114,7 @@
       .slides { height:auto; }
       .caption { font-size:15px; }
       .controls-row { gap:8px; }
+      nav { gap:6px; }
     }
 
     /* very small screens */
@@ -124,6 +125,17 @@
       .thumb { width:48px; height:48px; }
       .control-btn { font-size:14px; padding:9px 10px; }
     }
+
+    /* Additional fixes for alignments & overflow (mobile friendly) */
+    /* Ensure banner content wraps gracefully */
+    .banner-right { min-width:0; text-align:right; }
+    .banner-right > div { white-space:normal; }
+    .slides { width:100%; display:flex; flex-direction:column; align-items:center; }
+    .thumbs::-webkit-scrollbar { height:8px; }
+    .thumbs::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.08); border-radius:8px; }
+    .modal { -webkit-overflow-scrolling: touch; }
+    /* Make buttons more touch-friendly on mobile */
+    button { touch-action:manipulation; }
   </style>
 </head>
 <body>
@@ -149,11 +161,14 @@
 
     <header>
       <div class="logo" aria-label="A Gift for Michaela">A Gift for you my love😚</div>
+
+      <!-- Primary nav: made horizontally scrollable for small widths -->
       <nav aria-label="Primary navigation">
         <a href="#" class="active" onclick="return false" aria-current="page">Home</a>
         <a href="#" onclick="document.getElementById('surpriseBtn').focus(); return false">Surprise</a>
       </nav>
 
+      <!-- Controls -->
       <div class="controls" role="toolbar" aria-label="Controls">
         <button id="musicToggle" class="control-btn" aria-pressed="false" title="Play / Pause music">🔈 Play</button>
         <button id="surpriseBtn" class="control-btn" title="Open surprise">🎁 Surprise</button>
@@ -171,7 +186,7 @@
           </div>
         </div>
 
-        <div style="text-align:right;">
+        <div class="banner-right" style="text-align:right;">
           <div style="font-weight:800;color:var(--deep-blue)">From: Your King</div>
           <div style="color:var(--muted);margin-top:6px">Today is November 22 • It's your birthday!😚🎂</div>
         </div>
@@ -303,6 +318,7 @@
         const w = window.innerWidth;
         const h = window.innerHeight;
         canvases.forEach(c => {
+          if(!c) return;
           c.width = w * devicePixelRatio;
           c.height = h * devicePixelRatio;
           c.style.width = w + 'px';
@@ -429,35 +445,102 @@
     })();
 
     /* -------------------------
-       Music Toggle (no autoplay forced)
+       Music Toggle (fixed pause/resume behavior)
        ------------------------- */
     (function(){
       const musicToggle = document.getElementById('musicToggle');
       const bg = document.getElementById('bgMusic');
 
+      // Helper to set UI state consistently
+      function setPlayingUI(isPlaying) {
+        if (!musicToggle) return;
+        if (isPlaying) {
+          musicToggle.textContent = '🔊 Pause';
+          musicToggle.setAttribute('aria-pressed', 'true');
+        } else {
+          musicToggle.textContent = '🔈 Play';
+          musicToggle.setAttribute('aria-pressed', 'false');
+        }
+      }
+
+      // If audio element exists, listen to its events to sync UI reliably
+      if (bg) {
+        bg.addEventListener('play', () => setPlayingUI(true));
+        bg.addEventListener('playing', () => setPlayingUI(true));
+        bg.addEventListener('pause', () => setPlayingUI(false));
+        bg.addEventListener('ended', () => setPlayingUI(false));
+        bg.addEventListener('emptied', () => setPlayingUI(false));
+        // If the element already is playing (unlikely on load), reflect it
+        try { setPlayingUI(!bg.paused && bg.currentTime > 0 && !bg.ended); } catch(e) { setPlayingUI(false); }
+      }
+
+      // Toggle logic: check bg.paused and currentTime if available, then play/pause accordingly.
       musicToggle.addEventListener('click', () => {
-        if(!bg || !bg.src || bg.src.trim() === '') {
+        if (!bg) {
           musicToggle.textContent = '🔈 No music';
           musicToggle.setAttribute('aria-pressed', 'false');
           return;
         }
-        if(bg.paused){
-          bg.play().catch(() => { /* browsers sometimes block autoplay — silence fail */ });
-          musicToggle.textContent = '🔊 Pause';
-          musicToggle.setAttribute('aria-pressed', 'true');
-        } else {
-          bg.pause();
-          musicToggle.textContent = '🔈 Play';
+
+        // If currentSrc is empty but a <source> exists, let the browser load it
+        const hasSource = !!(bg.currentSrc || (bg.querySelector && bg.querySelector('source') && bg.querySelector('source').src));
+        if (!hasSource) {
+          // No source available
+          musicToggle.textContent = '🔈 No music';
           musicToggle.setAttribute('aria-pressed', 'false');
+          return;
+        }
+
+        // If audio is paused or not yet started -> attempt to play
+        if (bg.paused || bg.ended) {
+          const p = bg.play();
+          // some browsers return a promise
+          if (p && typeof p.then === 'function') {
+            p.then(() => {
+              // started playing
+              setPlayingUI(true);
+            }).catch((err) => {
+              // play blocked — keep UI as play and silently ignore
+              setPlayingUI(false);
+              // optional: console.warn('Autoplay blocked', err);
+            });
+          } else {
+            // play invoked synchronously
+            setPlayingUI(!bg.paused);
+          }
+        } else {
+          // audio is playing -> pause
+          try {
+            bg.pause();
+            setPlayingUI(false);
+          } catch (err) {
+            // if pause throws for any reason, fallback: set currentTime to 0 and pause
+            try {
+              bg.currentTime = 0;
+              bg.pause();
+            } catch (e) {}
+            setPlayingUI(false);
+          }
         }
       });
 
       // Attempt to start music after a user gesture (some browsers block autoplay)
       function userGesturePlay(){
-        try { bg.play(); musicToggle.textContent = '🔊 Pause'; musicToggle.setAttribute('aria-pressed', 'true'); } catch(e){}
+        if (!bg) return;
+        try {
+          const p = bg.play();
+          if (p && typeof p.then === 'function') {
+            p.then(() => setPlayingUI(true)).catch(()=>setPlayingUI(false));
+          } else {
+            setPlayingUI(!bg.paused);
+          }
+        } catch(e){
+          setPlayingUI(false);
+        }
         document.removeEventListener('click', userGesturePlay);
       }
       document.addEventListener('click', userGesturePlay, { once: true });
+
     })();
 
     /* -------------------------
@@ -514,7 +597,6 @@
                 // if play was blocked, optionally notify or silently ignore
               });
             }
-            // Optionally when giftMusic ends, you can resume bgMusic (not requested, so left unchanged)
           } catch(e){
             // ignore play errors
           }
